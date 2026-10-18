@@ -43,14 +43,17 @@ function RepairTable({ runs }: { runs: RepairRun[] }) {
             <th>Status</th>
             <th>Created</th>
             <th>Duration</th>
+            <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {runs.map((run) => (
             <tr key={run.id}>
               <td>
                 <span className="repair-id">{run.id}</span>
               </td>
+
               <td>
                 <div className="repository-name">
                   <GitBranch size={14} />
@@ -58,9 +61,23 @@ function RepairTable({ runs }: { runs: RepairRun[] }) {
                 </div>
                 <div className="issue-description">{run.issue}</div>
               </td>
-              <td><StatusBadge status={run.status} /></td>
+
+              <td>
+                <StatusBadge status={run.status} />
+              </td>
+
               <td className="table-muted">{run.createdAt}</td>
+
               <td className="table-muted">{run.duration}</td>
+
+              <td>
+                <Link
+                  to={`/repairs/${run.id}`}
+                  className="text-link"
+                >
+                  View details <ArrowRight size={14} />
+                </Link>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -70,16 +87,20 @@ function RepairTable({ runs }: { runs: RepairRun[] }) {
 }
 
 export default function Dashboard() {
-  // These controls let us preview UI states before API integration.
+  // Preview UI states before backend integration.
   const [mode, setMode] = useState<DashboardMode>("data");
 
   const runs = mode === "empty" ? [] : mockRepairRuns;
 
   const total = runs.length;
+
   const successful = runs.filter(
     (run) => run.status === "Successful",
   ).length;
-  const failed = runs.filter((run) => run.status === "Failed").length;
+
+  const failed = runs.filter(
+    (run) => run.status === "Failed",
+  ).length;
 
   const stats = [
     {
@@ -115,8 +136,12 @@ export default function Dashboard() {
             Monitor repair activity and inspect recent repair runs.
           </p>
         </div>
+
         <Link to="/repair">
-          <Button><Wrench size={16} /> New repair</Button>
+          <Button>
+            <Wrench size={16} />
+            New repair
+          </Button>
         </Link>
       </div>
 
@@ -127,16 +152,20 @@ export default function Dashboard() {
       </div>
 
       <div className="stats-grid">
-        {stats.map(({ label, value, icon: Icon, description, className }) => (
-          <Card key={label} className={`stat-card ${className}`}>
-            <div className="stat-top">
-              <span>{label}</span>
-              <Icon size={19} />
-            </div>
-            <strong className="stat-value">{value}</strong>
-            <span className="muted stat-caption">{description}</span>
-          </Card>
-        ))}
+        {stats.map(
+          ({ label, value, icon: Icon, description, className }) => (
+            <Card key={label} className={`stat-card ${className}`}>
+              <div className="stat-top">
+                <span>{label}</span>
+                <Icon size={19} />
+              </div>
+
+              <strong className="stat-value">{value}</strong>
+
+              <span className="muted stat-caption">{description}</span>
+            </Card>
+          ),
+        )}
       </div>
 
       <section className="recent-section">
@@ -154,8 +183,10 @@ export default function Dashboard() {
               onClick={() => setMode("data")}
               disabled={mode === "data"}
             >
-              <RefreshCw size={14} /> Sample data
+              <RefreshCw size={14} />
+              Sample data
             </Button>
+
             <Button
               variant="secondary"
               onClick={() => setMode("loading")}
@@ -163,6 +194,7 @@ export default function Dashboard() {
             >
               Preview loading
             </Button>
+
             <Button
               variant="secondary"
               onClick={() => setMode("empty")}
@@ -178,11 +210,16 @@ export default function Dashboard() {
             <LoadingState label="Loading repair runs..." />
           ) : runs.length === 0 ? (
             <div className="table-empty-state">
-              <span className="empty-icon"><History size={24} /></span>
+              <span className="empty-icon">
+                <History size={24} />
+              </span>
+
               <h3>No repair runs yet</h3>
+
               <p className="muted">
                 When repair runs become available, they will appear here.
               </p>
+
               <Link to="/repair">
                 <Button variant="secondary">
                   Prepare a repair <ArrowRight size={15} />
@@ -195,7 +232,11 @@ export default function Dashboard() {
         </Card>
 
         <div className="dashboard-footer">
-          <span><Clock3 size={14} /> Showing {runs.length} sample records</span>
+          <span>
+            <Clock3 size={14} />
+            Showing {runs.length} sample records
+          </span>
+
           <Link to="/history" className="text-link">
             View history <ArrowRight size={15} />
           </Link>

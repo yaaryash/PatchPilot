@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import NewRepair from "./pages/NewRepair";
 import Repositories from "./pages/Repositories";
 import History from "./pages/History";
+import RepairDetails from "./pages/RepairDetails";
 
 export default function App() {
   return (
@@ -15,7 +16,20 @@ export default function App() {
           <Route path="repair" element={<NewRepair />} />
           <Route path="repositories" element={<Repositories />} />
           <Route path="history" element={<History />} />
-          <Route path="*" element={<main className="not-found"><h1>404</h1><p>Page not found.</p></main>} />
+          <Route
+            path="repairs/:repairId"
+            element={<RepairDetails />}
+          />
+
+          <Route
+            path="*"
+            element={
+              <main className="not-found">
+                <h1>404</h1>
+                <p>Page not found.</p>
+              </main>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>
