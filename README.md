@@ -20,7 +20,7 @@ AI-powered code repair platform built with a modern TypeScript stack.
 
 ## Features
 
-### Frontend Foundation — Feature 1A
+### Frontend Foundation 
 
 - [x] Application shell with sidebar and top navigation
 - [x] Dashboard page
