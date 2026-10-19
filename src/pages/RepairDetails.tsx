@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -18,15 +19,19 @@ import {
   XCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+
 import {
   mockRepairDetails,
   type ChangedFile,
+  type RepairStage,
+  type TestResult,
 } from "../data/mockRepairDetails";
+
 import "./RepairDetails.css";
 
 type Decision = "approved" | "rejected" | "cancelled" | null;
 
-function statusLabel(status: string) {
+function statusLabel(status: RepairStage["status"]) {
   switch (status) {
     case "completed":
       return "Completed";
@@ -36,8 +41,6 @@ function statusLabel(status: string) {
       return "Pending";
     case "failed":
       return "Failed";
-    default:
-      return status;
   }
 }
 
@@ -58,7 +61,9 @@ function FileDiff({ file }: { file: ChangedFile }) {
           ) : (
             <ChevronRight size={17} />
           )}
+
           <FileCode2 size={17} />
+
           <span className="rd-file-path">{file.path}</span>
         </span>
 
@@ -72,10 +77,15 @@ function FileDiff({ file }: { file: ChangedFile }) {
       </button>
 
       {expanded && (
-        <div className="rd-diff-code" role="region" aria-label={`Diff for ${file.path}`}>
+        <div
+          className="rd-diff-code"
+          role="region"
+          aria-label={`Diff for ${file.path}`}
+        >
           {file.diff.map((line, index) => {
             const isAddition = line.startsWith("+");
             const isDeletion = line.startsWith("-");
+
             const className = isAddition
               ? "rd-diff-line addition"
               : isDeletion
@@ -83,10 +93,14 @@ function FileDiff({ file }: { file: ChangedFile }) {
                 : "rd-diff-line";
 
             return (
-              <div className={className} key={`${file.path}-${index}`}>
+              <div
+                className={className}
+                key={`${file.path}-${index}`}
+              >
                 <span className="rd-diff-marker">
                   {isAddition ? "+" : isDeletion ? "−" : " "}
                 </span>
+
                 <code>{line.replace(/^[+-]/, "")}</code>
               </div>
             );
@@ -162,7 +176,8 @@ export default function RepairDetails() {
             <h1>{repair.title}</h1>
 
             <p className="rd-subtitle">
-              Review the proposed repair, inspect the diff and check test results.
+              Review the proposed repair, inspect the diff and check test
+              results.
             </p>
           </div>
 
@@ -184,10 +199,12 @@ export default function RepairDetails() {
             ) : (
               <Circle size={19} />
             )}
+
             <div>
               <strong>{decisionText[decision]}</strong>
               <p>
-                Demo state only. No repository files or backend jobs were changed.
+                Demo state only. No repository files or backend jobs were
+                changed.
               </p>
             </div>
           </div>
@@ -198,7 +215,8 @@ export default function RepairDetails() {
             <span className="rd-card-label">Repository</span>
             <strong>{repair.repository}</strong>
             <span className="rd-muted">
-              <GitBranch size={14} /> {repair.branch}
+              <GitBranch size={14} />
+              {repair.branch}
             </span>
           </article>
 
@@ -206,29 +224,34 @@ export default function RepairDetails() {
             <span className="rd-card-label">Changed files</span>
             <strong>{repair.files.length}</strong>
             <span className="rd-muted">
-              <FileCode2 size={14} />{" "}
+              <FileCode2 size={14} />
               {repair.files.filter((file) => file.change === "modified").length}{" "}
               modified ·{" "}
-              {repair.files.filter((file) => file.change === "added").length} added
+              {repair.files.filter((file) => file.change === "added").length}{" "}
+              added
             </span>
           </article>
 
           <article className="rd-card rd-summary-card">
             <span className="rd-card-label">Test results</span>
             <strong>
-              {repair.tests.filter((test) => test.status === "passed").length} /{" "}
-              {repair.tests.length}
+              {repair.tests.filter((test) => test.status === "passed").length}{" "}
+              / {repair.tests.length}
             </strong>
             <span className="rd-muted">
-              <CheckCircle2 size={14} /> Passed tests in mock data
+              <CheckCircle2 size={14} />
+              Passed tests in mock data
             </span>
           </article>
 
           <article className="rd-card rd-summary-card">
             <span className="rd-card-label">Created</span>
-            <strong className="rd-created-date">{repair.createdAt.split(" · ")[0]}</strong>
+            <strong className="rd-created-date">
+              {repair.createdAt.split(" · ")[0]}
+            </strong>
             <span className="rd-muted">
-              <Clock3 size={14} /> {repair.createdAt.split(" · ")[1]}
+              <Clock3 size={14} />
+              {repair.createdAt.split(" · ")[1]}
             </span>
           </article>
         </section>
@@ -239,6 +262,7 @@ export default function RepairDetails() {
               <h2>Repair information</h2>
               <p>Original issue details supplied for this demo run.</p>
             </div>
+
             <span className="rd-language-pill">{repair.language}</span>
           </div>
 
@@ -255,6 +279,7 @@ export default function RepairDetails() {
               aria-expanded={showAllSteps}
             >
               <span>Reproduction steps</span>
+
               {showAllSteps ? (
                 <ChevronDown size={17} />
               ) : (
@@ -264,8 +289,8 @@ export default function RepairDetails() {
 
             {showAllSteps && (
               <ol className="rd-reproduction-list">
-                {repair.reproductionSteps.map((step) => (
-                  <li key={step}>{step}</li>
+                {repair.reproductionSteps.map((step, index) => (
+                  <li key={`${index}-${step}`}>{step}</li>
                 ))}
               </ol>
             )}
@@ -281,7 +306,7 @@ export default function RepairDetails() {
           </div>
 
           <div className="rd-timeline">
-            {repair.stages.map((stage, index) => (
+            {repair.stages.map((stage: RepairStage, index: number) => (
               <div className="rd-timeline-item" key={stage.id}>
                 <div className="rd-timeline-rail">
                   <span className={`rd-timeline-icon ${stage.status}`}>
@@ -295,6 +320,7 @@ export default function RepairDetails() {
                       <Circle size={12} />
                     )}
                   </span>
+
                   {index < repair.stages.length - 1 && (
                     <span className="rd-timeline-line" />
                   )}
@@ -303,10 +329,12 @@ export default function RepairDetails() {
                 <div className="rd-timeline-content">
                   <div className="rd-timeline-title-row">
                     <strong>{stage.title}</strong>
+
                     <span className={`rd-stage-status ${stage.status}`}>
                       {statusLabel(stage.status)}
                     </span>
                   </div>
+
                   <p>{stage.description}</p>
                 </div>
 
@@ -322,21 +350,27 @@ export default function RepairDetails() {
               <h2>Changed files</h2>
               <p>Inspect the sample patch before making a decision.</p>
             </div>
+
             <span className="rd-language-pill">
-              +{repair.files.reduce((total, file) => total + file.additions, 0)}{" "}
+              +
+              {repair.files.reduce(
+                (total, file) => total + file.additions,
+                0,
+              )}{" "}
               additions
             </span>
           </div>
 
           <div className="rd-file-list">
-            {repair.files.map((file) => (
+            {repair.files.map((file: ChangedFile) => (
               <FileDiff file={file} key={file.path} />
             ))}
           </div>
 
           <p className="rd-demo-note">
             <ShieldCheck size={16} />
-            Illustrative diff only — these changes have not been applied to a repository.
+            Illustrative diff only — these changes have not been applied to a
+            repository.
           </p>
         </section>
 
@@ -346,11 +380,12 @@ export default function RepairDetails() {
               <h2>Test results</h2>
               <p>Example results for the proposed patch.</p>
             </div>
+
             <span className="rd-language-pill">Demo data</span>
           </div>
 
           <div className="rd-test-list">
-            {repair.tests.map((test) => (
+            {repair.tests.map((test: TestResult) => (
               <details className="rd-test-row" key={test.id}>
                 <summary>
                   <span className={`rd-test-icon ${test.status}`}>
@@ -364,9 +399,11 @@ export default function RepairDetails() {
                   </span>
 
                   <span className="rd-test-name">{test.name}</span>
+
                   <span className={`rd-test-status ${test.status}`}>
                     {test.status}
                   </span>
+
                   <span className="rd-test-duration">{test.duration}</span>
                 </summary>
 
@@ -384,9 +421,7 @@ export default function RepairDetails() {
         <section className="rd-card rd-actions-section">
           <div>
             <h2>Review decision</h2>
-            <p>
-              Inspect the proposed changes before choosing an action.
-            </p>
+            <p>Inspect the proposed changes before choosing an action.</p>
           </div>
 
           <div className="rd-action-buttons">
@@ -434,8 +469,8 @@ export default function RepairDetails() {
         </section>
 
         <p className="rd-footer-note">
-          PatchPilot frontend prototype · All repair details, diffs and test results on
-          this page are mock data.
+          PatchPilot frontend prototype · All repair details, diffs and test
+          results on this page are mock data.
         </p>
       </div>
     </main>
