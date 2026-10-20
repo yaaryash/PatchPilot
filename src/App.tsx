@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
@@ -6,20 +5,19 @@ import NewRepair from "./pages/NewRepair";
 import Repositories from "./pages/Repositories";
 import History from "./pages/History";
 import RepairDetails from "./pages/RepairDetails";
-
+import Settings from "./pages/Settings";
+import Login from "./pages/Login";
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="login" element={<Login />} />
         <Route element={<AppLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="repair" element={<NewRepair />} />
           <Route path="repositories" element={<Repositories />} />
           <Route path="history" element={<History />} />
-          <Route
-            path="repairs/:repairId"
-            element={<RepairDetails />}
-          />
+          <Route path="repairs/:repairId" element={<RepairDetails />} />
 
           <Route
             path="*"
@@ -30,6 +28,7 @@ export default function App() {
               </main>
             }
           />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -18,6 +17,7 @@ import {
   type RepairRun,
   type RepairStatus,
 } from "../data/mockRepairs";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 type DashboardMode = "data" | "loading" | "empty";
 
@@ -71,10 +71,7 @@ function RepairTable({ runs }: { runs: RepairRun[] }) {
               <td className="table-muted">{run.duration}</td>
 
               <td>
-                <Link
-                  to={`/repairs/${run.id}`}
-                  className="text-link"
-                >
+                <Link to={`/repairs/${run.id}`} className="text-link">
                   View details <ArrowRight size={14} />
                 </Link>
               </td>
@@ -89,18 +86,15 @@ function RepairTable({ runs }: { runs: RepairRun[] }) {
 export default function Dashboard() {
   // Preview UI states before backend integration.
   const [mode, setMode] = useState<DashboardMode>("data");
+  const profile = useUserProfile();
 
   const runs = mode === "empty" ? [] : mockRepairRuns;
 
   const total = runs.length;
 
-  const successful = runs.filter(
-    (run) => run.status === "Successful",
-  ).length;
+  const successful = runs.filter((run) => run.status === "Successful").length;
 
-  const failed = runs.filter(
-    (run) => run.status === "Failed",
-  ).length;
+  const failed = runs.filter((run) => run.status === "Failed").length;
 
   const stats = [
     {
@@ -131,7 +125,7 @@ export default function Dashboard() {
       <div className="page-heading dashboard-heading">
         <div>
           <p className="eyebrow">OVERVIEW</p>
-          <h1>Good to see you, Developer.</h1>
+          <h1>Good to see you, {profile.displayName || "Developer"}.</h1>
           <p className="muted">
             Monitor repair activity and inspect recent repair runs.
           </p>
@@ -152,20 +146,18 @@ export default function Dashboard() {
       </div>
 
       <div className="stats-grid">
-        {stats.map(
-          ({ label, value, icon: Icon, description, className }) => (
-            <Card key={label} className={`stat-card ${className}`}>
-              <div className="stat-top">
-                <span>{label}</span>
-                <Icon size={19} />
-              </div>
+        {stats.map(({ label, value, icon: Icon, description, className }) => (
+          <Card key={label} className={`stat-card ${className}`}>
+            <div className="stat-top">
+              <span>{label}</span>
+              <Icon size={19} />
+            </div>
 
-              <strong className="stat-value">{value}</strong>
+            <strong className="stat-value">{value}</strong>
 
-              <span className="muted stat-caption">{description}</span>
-            </Card>
-          ),
-        )}
+            <span className="muted stat-caption">{description}</span>
+          </Card>
+        ))}
       </div>
 
       <section className="recent-section">
