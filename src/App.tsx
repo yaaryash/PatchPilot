@@ -7,11 +7,13 @@ import History from "./pages/History";
 import RepairDetails from "./pages/RepairDetails";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
+import ApiTest from "./pages/ApiTest";
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="login" element={<Login />} />
+        <Route path="/api-test" element={<ApiTest />} />
         <Route element={<AppLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="repair" element={<NewRepair />} />
