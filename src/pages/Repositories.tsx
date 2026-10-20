@@ -1,68 +1,60 @@
-
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   GitBranch,
-  Plus,
   Search,
   Code2,
-  X,
-  Trash2,
-  ExternalLink,
-  CheckCircle2,
   FolderGit2,
+  Star,
+  RefreshCw,
+  LockKeyhole,
+  Globe,
 } from "lucide-react";
+
 import "./Repositories.css";
 import { Card, Button, Badge } from "../components/ui";
-
-type Repository = {
-  id: string;
-  name: string;
-  owner: string;
-  language: string;
-  branch: string;
-  connected: boolean;
-};
-
-const initialRepositories: Repository[] = [
-  {
-    id: "repo-1",
-    name: "payment-service",
-    owner: "demo-workspace",
-    language: "TypeScript",
-    branch: "main",
-    connected: true,
-  },
-  {
-    id: "repo-2",
-    name: "user-dashboard",
-    owner: "demo-workspace",
-    language: "JavaScript",
-    branch: "main",
-    connected: true,
-  },
-  {
-    id: "repo-3",
-    name: "ml-pipeline",
-    owner: "demo-workspace",
-    language: "Python",
-    branch: "develop",
-    connected: false,
-  },
-];
+import { getGithubRepositories, type GithubRepository } from "../data/github";
+import { Link } from "react-router-dom";
 
 export default function Repositories() {
-  const [repositories, setRepositories] =
-    useState<Repository[]>(initialRepositories);
+  const [repositories, setRepositories] = useState<GithubRepository[]>([]);
   const [search, setSearch] = useState("");
   const [language, setLanguage] = useState("All");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [repoUrl, setRepoUrl] = useState("");
-  const [formError, setFormError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const languages = [
-    "All",
-    ...new Set(repositories.map((repo) => repo.language)),
-  ];
+  async function loadRepositories() {
+    setLoading(true);
+    setError("");
+
+    try {
+      const data = await getGithubRepositories();
+      setRepositories(data);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not load GitHub repositories.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadRepositories();
+  }, []);
+
+  const languages = useMemo(
+    () => [
+      "All",
+      ...new Set(
+        repositories
+          .map((repo) => repo.language)
+          .filter((value): value is string => Boolean(value)),
+      ),
+    ],
+    [repositories],
+  );
 
   const filteredRepositories = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -70,72 +62,14 @@ export default function Repositories() {
     return repositories.filter((repo) => {
       const matchesSearch =
         repo.name.toLowerCase().includes(query) ||
-        repo.owner.toLowerCase().includes(query);
+        repo.full_name.toLowerCase().includes(query) ||
+        (repo.description ?? "").toLowerCase().includes(query);
 
-      const matchesLanguage =
-        language === "All" || repo.language === language;
+      const matchesLanguage = language === "All" || repo.language === language;
 
       return matchesSearch && matchesLanguage;
     });
   }, [repositories, search, language]);
-
-  function handleConnectRepository() {
-    const value = repoUrl.trim().replace(/\/+$/, "");
-    const match = value.match(
-      /^(?:https?:\/\/)?github\.com\/([^/]+)\/([^/]+?)(?:\.git)?$/i
-    );
-
-    if (!match) {
-      setFormError(
-        "Enter a valid GitHub URL, e.g. https://github.com/owner/repository"
-      );
-      return;
-    }
-
-    const owner = match[1];
-    const name = match[2];
-
-    const alreadyExists = repositories.some(
-      (repo) =>
-        repo.owner.toLowerCase() === owner.toLowerCase() &&
-        repo.name.toLowerCase() === name.toLowerCase()
-    );
-
-    if (alreadyExists) {
-      setFormError("This repository is already in the list.");
-      return;
-    }
-
-    setRepositories((current) => [
-      ...current,
-      {
-        id: `${owner}-${name}-${Date.now()}`,
-        owner,
-        name,
-        language: "Unknown",
-        branch: "main",
-        connected: false,
-      },
-    ]);
-
-    setRepoUrl("");
-    setFormError("");
-    setIsModalOpen(false);
-    setSearch("");
-    setLanguage("All");
-  }
-
-  function handleRemoveRepository(id: string) {
-    const confirmed = window.confirm(
-      "Remove this repository from the demo list?"
-    );
-
-    if (confirmed) {
-      setRepositories((current) =>
-        current.filter((repo) => repo.id !== id)
-      );
-    }
-  }
 
   return (
     <>
@@ -143,21 +77,25 @@ export default function Repositories() {
         <div>
           <p className="eyebrow">YOUR CODEBASES</p>
           <h1>Repositories</h1>
-          <p className="muted">
-            Manage codebases for your repair workflows.
-          </p>
+          <p className="muted">Browse and manage your GitHub repositories.</p>
         </div>
 
-        <Button onClick={() => setIsModalOpen(true)}>
-          <Plus size={17} />
-          Connect repository
+        <Button
+          variant="secondary"
+          onClick={() => void loadRepositories()}
+          disabled={loading}
+        >
+          <RefreshCw size={16} />
+          Refresh
         </Button>
       </div>
 
       <div className="development-banner">
         <span className="development-dot" />
-        <strong>DEMO MODE</strong>
-        <span>Repositories are stored in temporary UI state only.</span>
+        <strong>GITHUB CONNECTED</strong>
+        <span>
+          Repository data is fetched from your authenticated GitHub account.
+        </span>
       </div>
 
       <div className="repository-toolbar">
@@ -169,6 +107,7 @@ export default function Repositories() {
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search repositories..."
             aria-label="Search repositories"
+            disabled={loading || Boolean(error)}
           />
         </label>
 
@@ -178,6 +117,7 @@ export default function Repositories() {
             value={language}
             onChange={(event) => setLanguage(event.target.value)}
             aria-label="Filter by language"
+            disabled={loading || Boolean(error)}
           >
             {languages.map((item) => (
               <option key={item} value={item}>
@@ -190,33 +130,58 @@ export default function Repositories() {
 
       <div className="repository-results-heading">
         <div>
-          <h2>Connected codebases</h2>
+          <h2>GitHub repositories</h2>
           <p className="muted">
-            {filteredRepositories.length} of {repositories.length} repositories
+            {loading
+              ? "Loading repositories..."
+              : error
+                ? "Repositories could not be loaded"
+                : `${filteredRepositories.length} of ${repositories.length} repositories`}
           </p>
         </div>
+
         <Badge>{repositories.length} repositories</Badge>
       </div>
 
-      {filteredRepositories.length === 0 ? (
+      {loading ? (
+        <Card className="repository-empty">
+          <RefreshCw size={25} />
+          <h2>Loading repositories</h2>
+          <p className="muted">
+            Fetching repositories from GitHub. Please wait.
+          </p>
+        </Card>
+      ) : error ? (
+        <Card className="repository-empty">
+          <span className="empty-icon">
+            <FolderGit2 size={25} />
+          </span>
+          <h2>Could not load repositories</h2>
+          <p className="muted">{error}</p>
+          <Button onClick={() => void loadRepositories()}>
+            <RefreshCw size={16} />
+            Try again
+          </Button>
+        </Card>
+      ) : filteredRepositories.length === 0 ? (
         <Card className="repository-empty">
           <span className="empty-icon">
             <FolderGit2 size={25} />
           </span>
           <h2>
             {repositories.length === 0
-              ? "No repositories yet"
+              ? "No repositories found"
               : "No matching repositories"}
           </h2>
           <p className="muted">
             {repositories.length === 0
-              ? "Connect a GitHub repository to add it to this demo list."
+              ? "No repositories were returned by GitHub for this account."
               : "Try another search term or language filter."}
           </p>
           {repositories.length === 0 && (
-            <Button onClick={() => setIsModalOpen(true)}>
-              <Plus size={16} />
-              Connect repository
+            <Button variant="secondary" onClick={() => void loadRepositories()}>
+              <RefreshCw size={16} />
+              Refresh
             </Button>
           )}
         </Card>
@@ -226,135 +191,58 @@ export default function Repositories() {
             <Card key={repo.id} className="repository-card">
               <div className="repository-card-top">
                 <span className="repository-icon">
-                  <GitBranch  size={22} />
+                  <GitBranch size={22} />
                 </span>
-                <Badge tone={repo.connected ? "success" : "neutral"}>
-                  {repo.connected ? "Connected (demo)" : "Not connected"}
+
+                <Badge tone={repo.private ? "neutral" : "success"}>
+                  {repo.private ? (
+                    <>
+                      <LockKeyhole size={12} /> Private
+                    </>
+                  ) : (
+                    <>
+                      <Globe size={12} /> Public
+                    </>
+                  )}
                 </Badge>
               </div>
 
               <div className="repository-card-title">
                 <h3>{repo.name}</h3>
-                <p className="muted">{repo.owner}</p>
+                <p className="muted">{repo.full_name}</p>
               </div>
+
+              <p className="muted repository-description">
+                {repo.description || "No description provided."}
+              </p>
 
               <div className="repository-meta">
                 <span>
                   <Code2 size={15} />
-                  {repo.language}
+                  {repo.language || "Unknown"}
                 </span>
+
                 <span>
-                  <GitBranch size={15} />
-                  {repo.branch}
+                  <Star size={15} />
+                  {repo.stars}
                 </span>
               </div>
 
               <div className="repository-card-footer">
                 <span className="repository-demo-note">
-                  <CheckCircle2 size={14} />
-                  Demo repository
+                  Updated {new Date(repo.updated_at).toLocaleDateString()}
                 </span>
-                <Button
-                  variant="secondary"
-                  onClick={() => handleRemoveRepository(repo.id)}
-                  aria-label={`Remove ${repo.name}`}
+
+                <Link
+                  className="repository-external-link"
+                  to={`/repositories/${encodeURIComponent(repo.full_name.split("/")[0])}/${encodeURIComponent(repo.name)}`}
                 >
-                  <Trash2 size={15} />
-                  Remove
-                </Button>
+                  <FolderGit2 size={15} />
+                  View details
+                </Link>
               </div>
             </Card>
           ))}
-        </div>
-      )}
-
-      {isModalOpen && (
-        <div
-          className="repository-modal-backdrop"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              setIsModalOpen(false);
-              setFormError("");
-            }
-          }}
-        >
-          <section
-            className="repository-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="connect-repository-title"
-          >
-            <div className="repository-modal-heading">
-              <div>
-                <p className="eyebrow">GITHUB</p>
-                <h2 id="connect-repository-title">Connect repository</h2>
-              </div>
-              <button
-                type="button"
-                className="icon-button"
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setFormError("");
-                }}
-                aria-label="Close dialog"
-              >
-                <X size={19} />
-              </button>
-            </div>
-
-            <p className="muted">
-              Add a public GitHub repository URL to the local demo list.
-              This does not authorize GitHub access.
-            </p>
-
-            <label className="repository-url-label" htmlFor="repository-url">
-              GitHub repository URL
-            </label>
-            <input
-              id="repository-url"
-              className="repository-url-input"
-              value={repoUrl}
-              onChange={(event) => {
-                setRepoUrl(event.target.value);
-                setFormError("");
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleConnectRepository();
-                }
-              }}
-              placeholder="https://github.com/owner/repository"
-              autoFocus
-            />
-
-            {formError && (
-              <p className="repository-form-error" role="alert">
-                {formError}
-              </p>
-            )}
-
-            <div className="repository-modal-actions">
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setRepoUrl("");
-                  setFormError("");
-                }}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleConnectRepository}>
-                <Plus size={16} />
-                Add to demo
-                <ExternalLink size={14} />
-              </Button>
-            </div>
-
-            <p className="repository-modal-footnote">
-              Demo only · No repository files are fetched or changed.
-            </p>
-          </section>
         </div>
       )}
     </>

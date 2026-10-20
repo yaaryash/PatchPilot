@@ -404,3 +404,28 @@ kbd { border: 1px solid #30394a; border-radius: 4px; padding: 2px 4px; font-size
     flex-wrap: wrap;
   }
 }
+
+.auth-status {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.auth-status p {
+  max-width: 480px;
+  color: #94a3b8;
+}
+
+.auth-status button {
+  padding: 10px 16px;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  background: #171c28;
+  color: inherit;
+  cursor: pointer;
+}

@@ -8,13 +8,25 @@ import RepairDetails from "./pages/RepairDetails";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import ApiTest from "./pages/ApiTest";
+import RequireAuth from "./components/RequireAuth";
+import RepositoryDetails from "./pages/RepositoryDetails";
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="login" element={<Login />} />
         <Route path="/api-test" element={<ApiTest />} />
-        <Route element={<AppLayout />}>
+        <Route
+          element={
+            <RequireAuth>
+              <AppLayout />
+            </RequireAuth>
+          }
+        >
+          <Route
+            path="repositories/:owner/:repo"
+            element={<RepositoryDetails />}
+          />
           <Route index element={<Dashboard />} />
           <Route path="repair" element={<NewRepair />} />
           <Route path="repositories" element={<Repositories />} />

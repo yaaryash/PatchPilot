@@ -1,0 +1,286 @@
+
+.repository-details-page {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.repository-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  color: inherit;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.repository-back-link:hover,
+.repository-external-link:hover {
+  text-decoration: underline;
+}
+
+.repository-detail-heading {
+  align-items: center;
+}
+
+.repository-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.repository-detail-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 220px;
+  text-align: center;
+  padding: 28px;
+}
+
+.repository-detail-state h2,
+.repository-detail-state p {
+  margin: 0;
+}
+
+.repository-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px;
+}
+
+.repository-detail-badges,
+.repository-overview-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.repository-detail-description {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.repository-overview-meta {
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 13px;
+}
+
+.repository-overview-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.repository-tree-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.repository-tree-heading h2,
+.repository-tree-heading p {
+  margin: 0;
+}
+
+.repository-tree-heading p {
+  margin-top: 5px;
+}
+
+.repository-tree-warning {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #b7791f;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.repository-file-list {
+  overflow: hidden;
+  padding: 0;
+}
+
+.repository-file-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  font-size: 13px;
+}
+
+.repository-file-row:last-child {
+  border-bottom: none;
+}
+
+.repository-file-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.repository-file-path {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.repository-file-type,
+.repository-file-size {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  .repository-detail-heading,
+  .repository-tree-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .repository-file-row {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .repository-file-size {
+    display: none;
+  }
+}
+
+.repository-file-row-clickable {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.repository-file-row-clickable:hover {
+  background: var(--surface-hover, rgba(127, 127, 127, 0.1));
+}
+
+.repository-file-row-clickable:focus-visible {
+  outline: 2px solid var(--accent, #7c83ff);
+  outline-offset: -2px;
+}
+
+.repository-code-panel {
+  margin-top: 24px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border, #303030);
+  border-radius: 12px;
+  background: #1d1f21;
+}
+
+.repository-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #383838;
+}
+
+.repository-code-header h2 {
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+
+.repository-code-header p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.repository-code-meta {
+  padding: 10px 20px;
+  color: #b0b0b0;
+  font-size: 12px;
+  border-bottom: 1px solid #383838;
+}
+
+.repository-code-block {
+  margin: 0;
+  padding: 20px;
+  max-height: 650px;
+  overflow: auto;
+  background: #1d1f21;
+  color: #f8f8f2;
+  font-size: 13px;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+.repository-code-block code {
+  font-family: "Cascadia Code", Consolas, monospace;
+  white-space: pre;
+}
+
+.repository-code-state {
+  margin-top: 20px;
+  padding: 20px;
+}
+
+
+.repository-code-panel {
+  scroll-margin-top: 24px;
+}
+
+.repository-code-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+
+.repository-breadcrumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.repository-breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.repository-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #a1a1aa);
+  font: inherit;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 5px;
+}
+
+.repository-breadcrumb:hover {
+  color: var(--text-primary, inherit);
+  background: var(--surface-hover, rgba(127, 127, 127, 0.1));
+}
+
+.repository-code-panel {
+  scroll-margin-top: 24px;
+}
+
+.repository-code-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}

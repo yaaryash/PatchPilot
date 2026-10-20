@@ -1,13 +1,12 @@
-
 # PatchPilot
 
 **AI-Powered Code Repair Platform**
 
-PatchPilot is a developer-focused platform designed to help engineers investigate bugs, generate proposed code fixes, review code diffs, inspect test results, and manage repair workflows from one interface.
+PatchPilot is a developer-focused platform designed to help engineers investigate bugs, explore source code, generate proposed fixes, review code diffs, inspect test results, and manage repair workflows from one interface.
 
-The long-term goal is to build a reliable AI-assisted repair workflow that connects repository analysis, patch generation, automated testing, and human approval.
+The goal is to build a reliable AI-assisted repair workflow that connects repository analysis, patch generation, automated testing, and human approval.
 
-> **Current status:** Frontend prototype in development. Repair records, code diffs, test results, and review actions currently use mock data. No real code repair or repository modification is performed.
+> **Current status:** PatchPilot currently includes a React + TypeScript frontend, an Express backend, GitHub OAuth authentication, authenticated repository listing, repository metadata and file-tree browsing, and source-code preview with syntax highlighting. AI-assisted bug analysis, patch generation, automated test execution, and actual code repair are still under development.
 
 ---
 
@@ -20,6 +19,7 @@ The long-term goal is to build a reliable AI-assisted repair workflow that conne
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
 - [Available Scripts](#available-scripts)
 - [Development Data](#development-data)
 - [Roadmap](#roadmap)
@@ -35,7 +35,8 @@ The long-term goal is to build a reliable AI-assisted repair workflow that conne
 Debugging software can involve many disconnected activities:
 
 - Reproducing bugs and understanding their root causes.
-- Finding the relevant source files.
+- Finding relevant source files in large repositories.
+- Investigating code and tracing dependencies.
 - Developing and reviewing code changes.
 - Running tests and inspecting failures.
 - Tracking repair progress.
@@ -48,10 +49,12 @@ PatchPilot aims to bring these activities into one workflow, with AI assistance 
 1. Provide a clear dashboard for repair activity.
 2. Collect structured bug reports and reproduction steps.
 3. Display repair progress through a status timeline.
-4. Present proposed file changes in a readable diff viewer.
-5. Surface test results and diagnostic output.
-6. Keep approval and cancellation decisions under developer control.
-7. Introduce backend processing, repository integration, and AI-assisted patch generation incrementally.
+4. Integrate GitHub authentication and repository access.
+5. Make repository files easier to explore and inspect.
+6. Present proposed file changes in a readable diff viewer.
+7. Surface test results and diagnostic output.
+8. Keep approval and cancellation decisions under developer control.
+9. Introduce backend processing, AI-assisted patch generation, and automated testing incrementally.
 
 ---
 
@@ -60,12 +63,13 @@ PatchPilot aims to bring these activities into one workflow, with AI assistance 
 ### Feature 1A — Application Layout
 
 - Sidebar navigation.
-- Top navigation and workspace header.
+- Application header and workspace layout.
 - Shared UI components.
 - Dashboard, New Repair, Repositories, and History navigation.
+- Repair details and settings pages.
 - Consistent application styling.
 
-**Status:** Initial implementation added; verify shared components and responsive behavior.
+**Status:** Implemented in the frontend.
 
 ### Feature 1B — Dashboard
 
@@ -74,26 +78,26 @@ PatchPilot aims to bring these activities into one workflow, with AI assistance 
 - Failed repairs statistic.
 - Recent repair runs table.
 - Repair status badges.
-- Loading-state preview.
-- Empty-state preview.
+- Loading and empty-state UI.
 - Development-only sample data.
 
-**Status:** Implemented with mock data; verify the latest build.
+**Status:** Implemented with mock data.
+
+**Limitation:** Repair statistics and repair records are not yet backed by a persistent repair database.
 
 ### Feature 1C — New Repair Form
 
-- Repository selection.
-- Bug title.
-- Bug description.
+- Repository selection UI.
+- Bug title and description fields.
 - Reproduction steps.
 - Input validation.
 - Submission loading state.
 - Demo success feedback.
 - Form reset behavior.
 
-**Status:** Frontend implementation added; verify form validation and interactions.
+**Status:** Frontend implementation.
 
-**Limitation:** Submissions are not saved to a backend and do not start a real repair job.
+**Limitation:** Submissions do not yet create persistent repair records or start a real repair job.
 
 ### Feature 1D — Repair Details
 
@@ -103,64 +107,121 @@ PatchPilot aims to bring these activities into one workflow, with AI assistance 
 - Changed files list.
 - Expandable unified diff viewer.
 - Test results with expandable output.
-- Approve Patch control.
-- Reject Patch control.
+- Approve Patch and Reject Patch controls.
 - Cancel Repair control.
 - Confirmation dialogs.
 - Demo-state reset.
-- Responsive layout.
 
-**Status:** UI renders locally; complete the interaction checks and production build verification.
+**Status:** Frontend implementation using illustrative repair data.
 
-**Limitation:** The displayed diff and test results are illustrative. Approval, rejection, cancellation, and reset only change local UI state.
+**Limitation:** Displayed diffs and test results are illustrative. Review actions do not apply code changes or execute real repair jobs.
+
+### Feature 2A — GitHub Authentication
+
+- GitHub OAuth login flow.
+- OAuth callback handling.
+- OAuth state verification.
+- Server-side session management.
+- HTTP-only session cookie.
+- Current-user authentication endpoint.
+- Logout endpoint.
+- Protected application routes.
+- Authentication loading and error states.
+
+**Status:** Implemented for local development.
+
+**Limitation:** Production deployment, session-store configuration, and additional security hardening remain future work.
+
+### Feature 2B — Repository Integration
+
+- Fetch repositories associated with the authenticated GitHub user.
+- Search repositories by name.
+- Filter repositories by programming language.
+- Display repository descriptions and visibility.
+- Display primary language and star counts.
+- Open repositories on GitHub.
+- View repository metadata.
+- Display the default branch and last updated date.
+- Retrieve the repository file tree.
+- Show file and folder entries.
+
+**Status:** Implemented for local development.
+
+### Feature 2C — Source Code Viewer
+
+- Fetch file contents through the backend.
+- Display source code inside the application.
+- Syntax highlighting using Prism.js.
+- Support for common source formats, including TypeScript, TSX, JavaScript, JSX, JSON, CSS, HTML, and Markdown.
+- Display file name, path, and size.
+- Open the original file on GitHub.
+- Loading and error states.
+- Close the code viewer.
+- Automatically scroll to the selected file preview.
+- Folder navigation and breadcrumbs in the repository browser.
+
+**Status:** Implemented locally; continue verifying edge cases and large-repository behavior.
+
+**Limitation:** Source preview is read-only. Patch generation, editing, committing, and applying repository changes are not implemented.
 
 ### Planned Features
 
-The following capabilities are planned and are not represented as completed functionality:
+The following capabilities are planned and are not yet implemented as complete production functionality:
 
-- Repository connection and management.
-- Searchable and filterable repository listings.
-- Repair history with status filters.
-- Backend API and persistent database.
+- AI-assisted bug investigation.
+- Root-cause analysis.
+- Context-aware source-code retrieval.
+- AI-generated patch proposals.
+- Real code diff generation.
+- Automated test execution.
 - Background repair jobs.
-- AI-assisted bug analysis and patch generation.
-- Real test execution and result collection.
-- Git provider integration.
+- Persistent repair history.
 - Secure patch approval and application.
-- Logging, monitoring, and audit history.
+- Audit logging and monitoring.
+- Production deployment.
 
 ---
 
 ## Technology Stack
 
-### Current Frontend
+### Frontend
 
 | Technology | Purpose |
 |---|---|
-| React | UI components |
+| React | UI components and application rendering |
 | TypeScript | Static typing |
-| Vite | Development server and build tooling |
-| React Router | Client-side navigation |
+| Vite | Development server and production build |
+| React Router | Client-side routing |
 | Lucide React | Icons |
 | CSS | Styling and responsive layouts |
+| Prism.js | Source-code syntax highlighting |
 
-### Potential Future Backend
+### Backend
 
-These are planned technology options, not currently integrated dependencies.
+| Technology | Purpose |
+|---|---|
+| Node.js | Backend runtime |
+| Express | HTTP API and routing |
+| TypeScript | Backend type safety |
+| express-session | Session management |
+| CORS | Frontend-to-backend cross-origin requests |
+| GitHub OAuth | User authentication |
+| GitHub REST API | Repository metadata, file trees, and source contents |
+
+### Planned Infrastructure
+
+These are possible future additions, not claims about the current implementation.
 
 | Technology | Potential purpose |
 |---|---|
-| Node.js | Backend runtime |
-| Express | HTTP API |
 | PostgreSQL | Persistent application data |
-| Redis | Caching and coordination |
+| Redis | Caching and job coordination |
 | BullMQ | Background job processing |
-| Kafka | Event streaming if scale and architecture justify it |
-| Docker | Isolated execution environments |
-| Git provider APIs | Repository access and pull request workflows |
+| Docker | Isolated test execution |
 | AI model APIs | Bug analysis and patch generation |
+| GitHub Pull Requests API | Proposed fixes and review workflows |
 
-Backend technology choices will be finalized when the backend architecture is implemented.
+Infrastructure choices will be finalized as the architecture evolves.
 
 ---
 
@@ -168,26 +229,36 @@ Backend technology choices will be finalized when the backend architecture is im
 
 ### Current Architecture
 
-The current prototype is a client-side React application.
-
 ```text
 Browser
    |
    v
-React + TypeScript
+React + TypeScript + Vite
    |
-   +-- Application Layout
-   +-- Dashboard
-   +-- New Repair Form
-   +-- Repair Details
-   +-- Repositories (UI)
-   +-- History (UI)
-   |
+   | HTTP requests with session cookies
    v
-Local Mock Data
+Express Backend
+   |
+   +---- GitHub OAuth
+   |
+   +---- Session Management
+   |
+   +---- Authentication API
+   |
+   +---- GitHub Repository API
+              |
+              +---- User Repositories
+              |
+              +---- Repository Metadata
+              |
+              +---- Repository File Tree
+              |
+              +---- Source File Contents
 ```
 
-No production backend, persistent storage, real test runner, or repository execution engine is connected.
+The frontend communicates with the Express backend. The backend handles the OAuth flow, maintains the authenticated session, and requests repository information from GitHub.
+
+Repair records, proposed patches, and test results remain separate from this GitHub integration and are not yet powered by a complete repair-processing backend.
 
 ### Intended Future Architecture
 
@@ -199,70 +270,79 @@ Backend API
       |
       +---- Authentication and Authorization
       |
-      +---- PostgreSQL
+      +---- Persistent Database
       |
-      +---- Redis / Job Queue
-                   |
-                   v
+      +---- Repair Job Queue
+                  |
+                  v
              Repair Worker
-                   |
-          +--------+--------+
-          |                 |
-          v                 v
-     Repository        AI Analysis
-      Checkout        and Patch Draft
-          |                 |
-          +--------+--------+
-                   |
-                   v
+                  |
+          +-------+--------+
+          |                |
+          v                v
+    Repository         AI Analysis
+     Checkout         and Patch Draft
+          |                |
+          +-------+--------+
+                  |
+                  v
              Test Execution
-                   |
-                   v
-          Human Review and Approval
-                   |
-                   v
-          Controlled Patch Application
+                  |
+                  v
+         Human Review and Approval
+                  |
+                  v
+        Controlled Patch Application
 ```
 
-This is a target architecture, not an implemented production system. Repository execution and patch application will require appropriate isolation, access controls, and validation.
+This is a target architecture, not a completed production system. Repository execution and patch application will require sandboxing, access controls, validation, and resource limits.
 
 ---
 
 ## Project Structure
 
-The frontend is organized by pages, shared components, and development data.
+The project contains a React frontend and a separate Express backend.
 
 ```text
 PatchPilot/
-├── public/
+├── server/
+│   ├── src/
+│   │   └── index.ts
+│   ├── .env                  # Local secrets; never commit
+│   └── package.json
 ├── src/
 │   ├── components/
 │   │   ├── AppLayout.tsx
-│   │   └── ui.tsx
+│   │   └── RequireAuth.tsx
 │   ├── data/
 │   │   ├── mockRepairs.ts
 │   │   ├── mockRepositories.ts
-│   │   └── mockRepairDetails.ts
+│   │   └── github.ts
+│   ├── hooks/
+│   │   └── useAuth.ts
 │   ├── pages/
 │   │   ├── Dashboard.tsx
 │   │   ├── NewRepair.tsx
-│   │   ├── RepairDetails.tsx
-│   │   ├── RepairDetails.css
 │   │   ├── Repositories.tsx
-│   │   └── History.tsx
+│   │   ├── RepositoryDetails.tsx
+│   │   ├── RepositoryDetails.css
+│   │   ├── History.tsx
+│   │   ├── RepairDetails.tsx
+│   │   ├── Settings.tsx
+│   │   └── Login.tsx
 │   ├── App.tsx
-│   ├── index.css
-│   └── main.tsx
+│   └── index.css
+├── public/
+├── .gitignore
 ├── index.html
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json
 ├── vite.config.ts
-├── .gitignore
 └── README.md
 ```
 
-The exact files may differ as development progresses. Keep this section synchronized with the actual repository.
+The exact project structure may evolve as new features are added. Keep this section synchronized with the repository.
 
 ---
 
@@ -273,18 +353,17 @@ The exact files may differ as development progresses. Keep this section synchron
 - Node.js LTS.
 - npm.
 - Git.
+- A GitHub account.
 - A code editor such as Visual Studio Code.
 
 ### 1. Clone the repository
-
-After the project has been pushed to GitHub:
 
 ```bash
 git clone <YOUR_GITHUB_REPOSITORY_URL>
 cd PatchPilot
 ```
 
-Replace the placeholder with your actual repository URL.
+Replace the placeholder with the URL of your GitHub repository.
 
 ### 2. Install dependencies
 
@@ -292,29 +371,98 @@ Replace the placeholder with your actual repository URL.
 npm install
 ```
 
-### 3. Start the development server
+### 3. Configure GitHub OAuth
+
+Create a GitHub OAuth App in your GitHub Developer Settings.
+
+For local development, configure:
+
+| Setting | Value |
+|---|---|
+| Homepage URL | `http://localhost:5173` |
+| Authorization callback URL | `http://localhost:3000/auth/github/callback` |
+
+The callback URL must match the one configured in the OAuth application.
+
+### 4. Configure environment variables
+
+Create `server/.env` with the required values:
+
+```dotenv
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+SESSION_SECRET=replace_with_a_long_random_secret
+FRONTEND_URL=http://localhost:5173
+PORT=3000
+```
+
+Use your actual OAuth credentials and a strong, randomly generated session secret.
+
+Do not commit `server/.env` or expose the client secret in frontend code.
+
+See [Environment Variables](#environment-variables) for details.
+
+### 5. Start the application
+
+From the project root, run:
 
 ```bash
 npm run dev
 ```
 
-Open the local URL printed in the terminal, typically:
+The root development script starts the frontend and backend using the configured npm scripts.
+
+Open the frontend URL printed in the terminal. In the current local configuration, this is typically:
 
 ```text
 http://localhost:5173
 ```
 
-### 4. Build the application
+### 6. Sign in with GitHub
+
+1. Open the application.
+2. Navigate to the login page if prompted.
+3. Select the GitHub login option.
+4. Authorize the OAuth application.
+5. Return to PatchPilot.
+6. Open the Repositories page to view available repositories.
+
+Repository visibility and access depend on the authenticated GitHub account and the permissions granted to the application.
+
+### 7. Browse source code
+
+1. Open Repositories.
+2. Search for or select a repository.
+3. Open its details page.
+4. Browse the available files and folders.
+5. Select a source file to preview its contents.
+6. Use the GitHub link to open the original file.
+
+### 8. Build the application
 
 ```bash
 npm run build
 ```
 
-### 5. Preview the production build
+This runs the configured TypeScript build checks and creates the frontend production bundle.
 
-```bash
-npm run preview
-```
+---
+
+## Environment Variables
+
+The backend uses environment variables for OAuth configuration and session security.
+
+| Variable | Purpose |
+|---|---|
+| `GITHUB_CLIENT_ID` | GitHub OAuth application client ID |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth application client secret |
+| `SESSION_SECRET` | Secret used to sign session identifiers |
+| `FRONTEND_URL` | Frontend origin used for redirects and CORS |
+| `PORT` | Backend port, typically `3000` locally |
+
+Keep secret values in local environment files or an appropriate secrets manager.
+
+The frontend should never contain the GitHub OAuth client secret or a server-side access token.
 
 ---
 
@@ -322,29 +470,45 @@ npm run preview
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Starts the local development server |
-| `npm run build` | Runs TypeScript build checks and creates a production bundle |
-| `npm run preview` | Serves the production build locally |
+| `npm run dev` | Starts the frontend and backend development processes |
+| `npm run dev:frontend` | Starts the Vite frontend |
+| `npm run dev:backend` | Starts the backend development process |
+| `npm run build` | Runs TypeScript build checks and builds the frontend |
+| `npm run preview` | Previews the frontend production build |
 
-Available scripts depend on the project's `package.json`.
+Available scripts depend on the root and backend `package.json` configurations.
 
 ---
 
 ## Development Data
 
-The current prototype uses local mock data to demonstrate the UI before backend integration.
+The current application combines real GitHub integration with local mock data for repair-related screens.
+
+### Live GitHub Data
+
+The GitHub integration retrieves repository information and source contents through the backend.
 
 Examples include:
 
+- Authenticated user information.
+- Repository names and descriptions.
+- Repository visibility and default branch.
+- Star counts and update timestamps.
+- Repository file-tree entries.
+- Source file contents.
+
+### Mock Repair Data
+
+Repair-related screens may use illustrative data for:
+
 - Sample repair records.
-- Example repository names.
-- Illustrative file changes and code diffs.
+- Example code diffs.
 - Example test statuses and output.
 - Local-only approval, rejection, cancellation, and reset states.
 
 These examples are not verified production repair results.
 
-Do not use the mock test results to conclude that a proposed patch fixes a real issue. No actual repository changes are made by the current UI.
+Do not treat mock test results as proof that a proposed patch fixes a real issue.
 
 ---
 
@@ -356,39 +520,52 @@ Do not use the mock test results to conclude that a proposed patch fixes a real 
 - [x] Dashboard UI
 - [x] New Repair form UI
 - [x] Repair Details UI
-- [ ] Verify all interactions and responsive behavior
-- [ ] Verify a successful production build
-- [ ] Repositories page implementation and verification
-- [ ] History page implementation and verification
+- [x] Repositories page
+- [x] History page
+- [x] Production build verification during development
+- [ ] Automated frontend tests
+- [ ] Comprehensive responsive and accessibility testing
 
-### Phase 2 — Backend Foundation
+### Phase 2 — Backend and Authentication
 
-- [ ] Define API contracts and data models
-- [ ] Implement backend application
-- [ ] Add persistent database storage
-- [ ] Validate and persist repair submissions
-- [ ] Add API error handling
+- [x] Express backend foundation
+- [x] GitHub OAuth flow
+- [x] Session-based authentication
+- [x] Current-user endpoint
+- [x] Logout endpoint
+- [x] Protected frontend routes
+- [ ] Persistent session store for production
+- [ ] Additional authorization and integration tests
+- [ ] Production deployment configuration
 
-### Phase 3 — Repair Job Processing
+### Phase 3 — Repository Integration
 
-- [ ] Create repair job lifecycle
-- [ ] Implement job status transitions
+- [x] Fetch authenticated user's repositories
+- [x] Search and filter repositories
+- [x] Fetch repository metadata
+- [x] Retrieve repository file-tree entries
+- [x] Retrieve source file contents
+- [x] Preview source code with syntax highlighting
+- [x] Open repository and file links on GitHub
+- [x] Implement local folder navigation and breadcrumbs
+- [ ] Improve large-repository tree handling
+- [ ] Add automated integration tests
+- [ ] Add more robust file-type and binary-file handling
+
+### Phase 4 — Repair Job Processing
+
+- [ ] Define repair job API contracts and data models
+- [ ] Persist repair submissions
+- [ ] Implement repair job lifecycle
 - [ ] Add background job processing
 - [ ] Add progress and failure reporting
 - [ ] Implement cancellation of actual running jobs
 
-### Phase 4 — Repository Integration
-
-- [ ] Secure repository connection
-- [ ] Fetch repository metadata
-- [ ] Retrieve source code safely
-- [ ] Track changed files
-- [ ] Integrate version-control workflows
-
 ### Phase 5 — AI-Assisted Repair
 
 - [ ] Analyze bug reports
-- [ ] Inspect relevant source files
+- [ ] Identify relevant source files
+- [ ] Implement root-cause analysis
 - [ ] Generate proposed patches
 - [ ] Validate patch structure
 - [ ] Display real diffs for review
@@ -398,57 +575,70 @@ Do not use the mock test results to conclude that a proposed patch fixes a real 
 - [ ] Execute tests in an isolated environment
 - [ ] Collect real test output
 - [ ] Display passed, failed, and skipped tests
-- [ ] Add secure approval and rejection workflows
-- [ ] Apply patches only through controlled operations
+- [ ] Implement secure approval and rejection workflows
+- [ ] Apply patches through controlled operations
+- [ ] Add repair audit history
 
 ### Phase 7 — Production Readiness
 
-- [ ] Authentication and authorization
+- [ ] Production authentication and authorization hardening
+- [ ] Secure session storage and cookie configuration
 - [ ] Secrets management
-- [ ] Audit logging
 - [ ] Rate limiting and resource limits
+- [ ] Audit logging
 - [ ] Monitoring and error reporting
-- [ ] Deployment and operational documentation
+- [ ] Deployment documentation
+- [ ] Security and integration testing
 
-Checkboxes should be updated as features are actually implemented and verified.
+Checkboxes should reflect verified implementation status rather than planned work.
 
 ---
 
 ## Testing and Verification
 
-For the current frontend prototype:
+For local development:
 
 1. Install dependencies using `npm install`.
-2. Start the application using `npm run dev`.
-3. Visit the Dashboard and navigate to each page.
-4. Check New Repair form validation and loading feedback.
-5. Open a repair details page.
-6. Expand reproduction steps, file diffs, and test output.
-7. Test the review-action confirmation dialogs.
-8. Check the layout at desktop and mobile widths.
-9. Run `npm run build`.
-10. Fix errors before committing changes.
+2. Configure the GitHub OAuth application.
+3. Set the required backend environment variables.
+4. Start the application using `npm run dev`.
+5. Sign in with GitHub.
+6. Verify repository listing, search, and language filtering.
+7. Open a repository and inspect its metadata and file tree.
+8. Preview source files and verify syntax highlighting.
+9. Test folder navigation and breadcrumbs.
+10. Test logout and protected-route behavior.
+11. Run `npm run build`.
+12. Review changes before committing.
 
-Automated unit tests, integration tests, and end-to-end tests should be added as the project evolves.
+Automated unit, integration, and end-to-end tests should be added as the project evolves.
+
+A successful production build verifies compilation and bundling; it does not, by itself, verify all runtime behavior.
 
 ---
 
 ## Security Considerations
 
-A future production version must treat repository code and generated patches as untrusted input.
+Repository access and future code-repair workflows require careful security controls.
 
 Important considerations include:
 
-- Never expose API keys, passwords, or access tokens in frontend code.
-- Keep secrets in environment variables or an appropriate secret manager.
+- Never commit OAuth secrets, passwords, session secrets, or access tokens.
+- Keep secrets on the backend.
+- Validate OAuth state during the authorization flow.
+- Restrict CORS to trusted origins.
+- Use secure cookie settings in production.
+- Use an appropriate persistent session store in production.
+- Enforce authorization for repository access and repair operations.
+- Handle GitHub API errors and rate limits appropriately.
+- Treat repository contents and generated patches as untrusted input.
 - Never execute arbitrary repository code directly on the application server without isolation.
 - Use sandboxed workers and resource limits for test execution.
-- Require authorization for repository access and patch operations.
 - Validate generated patches before applying them.
 - Keep an audit trail of approval and application decisions.
 - Avoid treating AI-generated changes as automatically safe or correct.
 
-The current frontend prototype does not implement these production security controls.
+The current local-development configuration is not a complete production security setup. Production deployment requires additional hardening and testing.
 
 ---
 
@@ -459,19 +649,23 @@ Contributions and improvements are welcome.
 Suggested workflow:
 
 1. Create a focused branch.
-2. Implement one feature at a time.
+2. Implement one feature or fix at a time.
 3. Update this README when functionality changes.
 4. Run `npm run build`.
-5. Review the changes before committing.
-6. Push the branch and open a pull request when appropriate.
+5. Test the relevant application flow.
+6. Review staged changes before committing.
+7. Push the branch and open a pull request when appropriate.
 
 Use clear commit messages, for example:
 
 ```text
-feat: add repair details page
-fix: resolve repair details route
+feat: integrate GitHub repository listing
+feat: add repository source viewer
+fix: improve repository file navigation
 docs: update project README
 ```
+
+Never include environment files, secrets, or unrelated generated artifacts in a commit.
 
 ---
 
