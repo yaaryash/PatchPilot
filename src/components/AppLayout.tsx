@@ -1,11 +1,5 @@
-
 import { useEffect, useMemo, useState } from "react";
-import {
-  NavLink,
-  Outlet,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Activity,
   Clock3,
@@ -18,10 +12,12 @@ import {
   Wrench,
   X,
   ArrowUpRight,
+  LogOut,
 } from "lucide-react";
 
 import { mockRepairRuns } from "../data/mockRepairs";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { useAuth } from "../hooks/useAuth";
 import "./AppLayout.css";
 
 const navigation = [
@@ -43,14 +39,16 @@ export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const profile = useUserProfile();
+  const { user, loading, signOut } = useAuth();
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const avatarLetter =
-    profile.displayName.trim().charAt(0).toUpperCase() || "D";
+  const displayName =
+    user?.name || user?.login || profile.displayName || "Developer";
 
+  const avatarLetter = displayName.trim().charAt(0).toUpperCase() || "D";
   const pageTitle =
     navigation.find((item) => item.path === location.pathname)?.label ??
     (location.pathname.startsWith("/repairs/")
@@ -87,7 +85,7 @@ export default function AppLayout() {
       .filter((result) =>
         `${result.title} ${result.description} ${result.category}`
           .toLowerCase()
-          .includes(normalizedQuery)
+          .includes(normalizedQuery),
       )
       .slice(0, 10);
   }, [query]);
@@ -95,8 +93,7 @@ export default function AppLayout() {
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
       const isSearchShortcut =
-        (event.ctrlKey || event.metaKey) &&
-        event.key.toLowerCase() === "k";
+        (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k";
 
       if (isSearchShortcut) {
         event.preventDefault();
@@ -136,14 +133,12 @@ export default function AppLayout() {
     navigate(result.path);
   }
 
-  function handleSearchKeyDown(
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) {
+  function handleSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "ArrowDown") {
       event.preventDefault();
 
       setActiveIndex((index) =>
-        results.length === 0 ? 0 : (index + 1) % results.length
+        results.length === 0 ? 0 : (index + 1) % results.length,
       );
     }
 
@@ -153,7 +148,7 @@ export default function AppLayout() {
       setActiveIndex((index) =>
         results.length === 0
           ? 0
-          : (index - 1 + results.length) % results.length
+          : (index - 1 + results.length) % results.length,
       );
     }
 
@@ -167,6 +162,15 @@ export default function AppLayout() {
     setQuery("");
     setActiveIndex(0);
     setSearchOpen(true);
+  }
+  async function handleLogout() {
+    try {
+      await signOut();
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout failed:", error);
+      window.alert("Logout failed. Please try again.");
+    }
   }
 
   return (
@@ -206,9 +210,7 @@ export default function AppLayout() {
               <Icon size={18} />
               <span>{label}</span>
 
-              {label === "New Repair" && (
-                <span className="nav-plus">↗</span>
-              )}
+              {label === "New Repair" && <span className="nav-plus">↗</span>}
             </NavLink>
           ))}
         </nav>
@@ -235,15 +237,33 @@ export default function AppLayout() {
           </button>
 
           <div className="user-profile">
-            <div className="user-avatar">{avatarLetter}</div>
+            {user?.avatar_url ? (
+              <img
+                className="user-avatar"
+                src={user.avatar_url}
+                alt={`${displayName}'s GitHub avatar`}
+              />
+            ) : (
+              <div className="user-avatar">{avatarLetter}</div>
+            )}
 
             <div>
-              <strong>{profile.displayName || "Developer"}</strong>
-              <small>Local workspace</small>
+              <strong>{displayName}</strong>
+              <small>{user ? `@${user.login}` : "Local workspace"}</small>
             </div>
 
             <Activity size={16} className="online-icon" />
           </div>
+          <button
+            type="button"
+            className="logout-button"
+            onClick={handleLogout}
+            disabled={loading || !user}
+            title={user ? "Sign out of GitHub" : "Login to GitHub first"}
+          >
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
         </div>
       </aside>
 
@@ -270,13 +290,22 @@ export default function AppLayout() {
             <span className="status-dot" />
             <span className="system-status">System ready</span>
 
-            <div
-              className="user-avatar small-avatar"
-              aria-label={`Profile: ${profile.displayName}`}
-              title={profile.displayName}
-            >
-              {avatarLetter}
-            </div>
+            {user?.avatar_url ? (
+              <img
+                className="user-avatar small-avatar"
+                src={user.avatar_url}
+                alt={`${displayName}'s GitHub avatar`}
+                title={displayName}
+              />
+            ) : (
+              <div
+                className="user-avatar small-avatar"
+                aria-label={`Profile: ${displayName}`}
+                title={displayName}
+              >
+                {avatarLetter}
+              </div>
+            )}
           </div>
         </header>
 
@@ -363,9 +392,7 @@ export default function AppLayout() {
                 <div className="global-search-empty">
                   <Search size={22} />
                   <strong>No results found</strong>
-                  <span>
-                    Try a repair ID, issue title, or page name.
-                  </span>
+                  <span>Try a repair ID, issue title, or page name.</span>
                 </div>
               )}
             </div>

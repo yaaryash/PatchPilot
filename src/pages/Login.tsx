@@ -1,17 +1,12 @@
-
 import { useState } from "react";
 import { GitBranch, ShieldCheck, Wrench } from "lucide-react";
 import "./Login.css";
 
 export default function Login() {
-  const [message, setMessage] = useState("");
-
+  const [message] = useState("");
   function handleGithubLogin() {
-    setMessage(
-      "GitHub sign-in is not connected yet. OAuth will be enabled after the backend is implemented."
-    );
+    window.location.href = "http://localhost:3000/auth/github";
   }
-
   return (
     <main className="login-page">
       <section className="login-card">
@@ -25,9 +20,8 @@ export default function Login() {
         <div className="login-heading">
           <h1>Welcome to PatchPilot</h1>
           <p>
-            Your AI-powered code repair workspace.
-            Investigate bugs, review proposed fixes, and
-            manage repair workflows in one place.
+            Your AI-powered code repair workspace. Investigate bugs, review
+            proposed fixes, and manage repair workflows in one place.
           </p>
         </div>
 
@@ -49,16 +43,15 @@ export default function Login() {
         <div className="login-security-note">
           <ShieldCheck size={18} />
           <span>
-            Secure repository access and authentication
-            will be handled by the PatchPilot backend.
+            Secure repository access and authentication will be handled by the
+            PatchPilot backend.
           </span>
         </div>
 
         <div className="login-divider" />
 
         <p className="login-footer">
-          Built for developers who want to fix bugs
-          with confidence.
+          Built for developers who want to fix bugs with confidence.
         </p>
       </section>
 
